@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:retag_app/Admin_main_screen.dart';
+import 'package:retag_app/Driver_main_screen.dart';
 import 'package:retag_app/home_screen.dart';
 import 'LoginLogic.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 // import 'home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(LoginApp());
 }
 
@@ -24,6 +30,7 @@ class LoginApp extends StatelessWidget {
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
+  String role = "user";
   final logic = LoginLogic();
   @override
   Widget build(BuildContext context) {
@@ -99,8 +106,18 @@ class LoginScreen extends StatelessWidget {
             color: Color.fromRGBO(126, 148, 192, 1),
             child: CupertinoButton(
               onPressed: () {
-                bool login = logic.checklogin();
-                if (login) {
+                String login = logic.checklogin(role);
+                if (login == "admin") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AdminHomeScreen()),
+                  );
+                } else if (login == "driver") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DriverHomeScreen()),
+                  );
+                } else if (login == "user") {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => HomeScreen()),

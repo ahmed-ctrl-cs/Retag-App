@@ -10,9 +10,17 @@ class Tripdetailscreen extends StatefulWidget {
 }
 
 class _TripdetailscreenState extends State<Tripdetailscreen> {
-  final passnum = TextEditingController();
-  final bagnum = TextEditingController();
+  final passnum = TextEditingController(text: "1");
+  final bagnum = TextEditingController(text: "0");
   final notes = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    passnum.addListener(() {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -226,7 +234,7 @@ class _TripdetailscreenState extends State<Tripdetailscreen> {
               ),
               SizedBox(height: 20),
               Text(
-                "Total price : ${widget.tripdata.trip_price}xNumberOfPassengers",
+                "Total price : ${widget.tripdata.trip_price * (int.tryParse(passnum.text) ?? 0)}",
               ),
             ],
           ),

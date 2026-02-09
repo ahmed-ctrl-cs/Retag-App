@@ -173,6 +173,11 @@ class HomeScreen extends StatelessWidget {
           },
         ),
       ),
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.all(30),
+        decoration: BoxDecoration(color: Color.fromRGBO(126, 148, 192, 0)),
+        child: ElevatedButton(onPressed: () {}, child: Text("My reservations")),
+      ),
     );
   }
 }

@@ -13,6 +13,7 @@ class Trip {
   );
 }
 
+//this is to help with the hour formating to make it in the 12 hour format rather than the 24 hour format
 String GetFormatedHour(int hour) {
   if (hour == 12) {
     return "12 PM";
