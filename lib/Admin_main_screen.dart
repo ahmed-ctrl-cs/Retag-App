@@ -48,7 +48,10 @@ Widget BuildAdminCard({
     borderRadius: BorderRadius.circular(20),
     child: Container(
       padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(color: Color.fromRGBO(255, 255, 255, 0.1)),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(255, 255, 255, 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

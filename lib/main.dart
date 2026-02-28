@@ -48,7 +48,7 @@ class LoginApp extends StatelessWidget {
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
-  String role = "user";
+  String role = "admin";
   final logic = LoginLogic();
   @override
   Widget build(BuildContext context) {
