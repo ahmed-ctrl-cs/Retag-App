@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:retag_app/Admin_main_screen.dart';
@@ -37,7 +38,33 @@ class LoginApp extends StatelessWidget {
             );
           }
           if (snapshot.hasData) {
-            return HomeScreen();
+            String uid = snapshot.data!.uid;
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .get(),
+              builder: (context, UserSnapshot) {
+                if (UserSnapshot.connectionState == ConnectionState.waiting) {
+                  return Scaffold(
+                    body: Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                  );
+                }
+                if (UserSnapshot.hasData && UserSnapshot.data!.exists) {
+                  String role = UserSnapshot.data!.get('role');
+                  if (role == 'admin') {
+                    return AdminMainScreen();
+                  } else if (role == 'driver') {
+                    return DriverHomeScreen();
+                  } else if (role == 'user') {
+                    return HomeScreen();
+                  }
+                }
+                return LoginScreen();
+              },
+            );
           }
           return LoginScreen();
         },

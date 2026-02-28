@@ -19,7 +19,7 @@ class AdminMainScreen extends StatelessWidget {
               subtitle: "Create, edit or delete trips",
               icon: Icons.edit_road,
               onTap: () {
-                print("Manage trips clicked");
+                print("manage");
               },
             ),
             BuildAdminCard(
@@ -27,7 +27,41 @@ class AdminMainScreen extends StatelessWidget {
               subtitle: "Assign trips to drivers",
               icon: Icons.assessment_outlined,
               onTap: () {
-                print("Assign trips clicked");
+                print("assign");
+              },
+            ),
+            BuildAdminCard(
+              title: 'Driver Status',
+              subtitle: 'See what the drivers are doing now',
+              icon: Icons.drive_eta_rounded,
+              onTap: () {
+                print("car");
+              },
+            ),
+            BuildAdminCard(
+              title: 'Revenue',
+              subtitle:
+                  'See how much money your company made in the last month',
+              icon: Icons.attach_money,
+              onTap: () {
+                print('money');
+              },
+            ),
+            BuildAdminCard(
+              title: 'Manage users',
+              subtitle:
+                  'See user info, upgrade users, downgrade users, block th...',
+              icon: Icons.verified_user,
+              onTap: () {
+                print('userm');
+              },
+            ),
+            BuildAdminCard(
+              title: 'Trips price',
+              subtitle: 'Set prices for the trips for every pickup location',
+              icon: Icons.money,
+              onTap: () {
+                print('price');
               },
             ),
           ],
