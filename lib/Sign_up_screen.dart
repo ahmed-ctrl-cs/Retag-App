@@ -38,40 +38,52 @@ class SignupScreen extends StatelessWidget {
               SizedBox(height: 20),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 110),
-                child: CupertinoButton(
-                  child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.1),
-                          blurRadius: 20,
+                child: ValueListenableBuilder(
+                  valueListenable: logic.isLoading,
+                  builder: (context, isLoading, child) {
+                    return CupertinoButton(
+                      child: Container(
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.1),
+                              blurRadius: 20,
+                            ),
+                          ],
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                         ),
-                      ],
-                      color: Color.fromRGBO(255, 255, 255, 0.3),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(color: Colors.white),
+                        child: Center(
+                          child: isLoading
+                              ? CupertinoActivityIndicator(color: Colors.white)
+                              : Text(
+                                  "Sign Up",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                        ),
                       ),
-                    ),
-                  ),
-                  onPressed: () {
-                    if (logic.checksignup()) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Please fill all the fields"),
-                          backgroundColor: Colors.redAccent,
-                        ),
-                      );
-                    }
+                      onPressed: isLoading
+                          ? null
+                          : () async {
+                              String result = await logic.CheckSignUp();
+                              if (result == "Success") {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeScreen(),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(result),
+                                    backgroundColor: Colors.redAccent,
+                                  ),
+                                );
+                              }
+                            },
+                    );
                   },
                 ),
               ),
@@ -81,14 +93,15 @@ class SignupScreen extends StatelessWidget {
       ),
     );
   }
-//this was pasted from ai,i was so drained that i could not think or even code
-//anyway, it should work,i hope you like it
-//thoughts
-//man i hope this thing works, i really did put alot of time into it,aaaaaaggggghhhhhh
-//i am tired
-//it should look good while also working fine
-//oh shit , i did not connect it to firebase yet
-//this will be hell when connecting it
+
+  //this was pasted from ai,i was so drained that i could not think or even code
+  //anyway, it should work,i hope you like it
+  //thoughts
+  //man i hope this thing works, i really did put alot of time into it,aaaaaaggggghhhhhh
+  //i am tired
+  //it should look good while also working fine
+  //oh shit , i did not connect it to firebase yet
+  //this will be hell when connecting it
   Widget _buildTextField(String labelText, TextEditingController controller) {
     return Container(
       padding: EdgeInsets.only(left: 15, right: 15, bottom: 20),

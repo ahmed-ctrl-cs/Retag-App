@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'trip_data_holder.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Tripdetailscreen extends StatefulWidget {
   final Trip tripdata;
@@ -13,6 +15,12 @@ class _TripdetailscreenState extends State<Tripdetailscreen> {
   final passnum = TextEditingController(text: "1");
   final bagnum = TextEditingController(text: "0");
   final notes = TextEditingController();
+  final List<String> pickUp = ['location a', 'location b'];
+  final List<String> dropOff = ['location z', 'location c'];
+  String? selectedPickup;
+  String? selectedDropoff;
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -20,6 +28,17 @@ class _TripdetailscreenState extends State<Tripdetailscreen> {
       setState(() {});
     });
   }
+
+  //---Start helper function to update price according to pickup location---//
+  double GetDynamicPrice() {
+    double BasePrice = widget.tripdata.trip_price;
+    if (selectedPickup == "location a")
+      BasePrice = 70;
+    else if (selectedPickup == "location b")
+      BasePrice = 60;
+    return BasePrice;
+  }
+  //---End helper function to update price according to pickup location---//
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +189,7 @@ class _TripdetailscreenState extends State<Tripdetailscreen> {
                   child: Column(
                     children: [
                       //this block is for the three text fields
+                      //---Start asking for passengers---//
                       Container(
                         padding: EdgeInsets.all(8),
                         child: TextField(
@@ -189,6 +209,8 @@ class _TripdetailscreenState extends State<Tripdetailscreen> {
                           controller: passnum,
                         ),
                       ),
+                      //---End asking for passengers---//
+                      //---Start asking for bags---//
                       Container(
                         padding: EdgeInsets.all(8),
                         child: TextField(
@@ -208,6 +230,72 @@ class _TripdetailscreenState extends State<Tripdetailscreen> {
                           controller: bagnum,
                         ),
                       ),
+                      //---End asking for bags---//
+                      //---Start asking for pickup location---//
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: "Pickup Location",
+                            labelStyle: TextStyle(
+                              color: Color.fromRGBO(125, 179, 59, 1),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          dropdownColor: Color.fromRGBO(44, 62, 80, 1),
+                          style: TextStyle(
+                            color: Color.fromRGBO(255, 206, 206, 1),
+                          ),
+                          value: selectedPickup,
+                          items: pickUp.map((String location) {
+                            return DropdownMenuItem(
+                              child: Text(location),
+                              value: location,
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedPickup = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                      //---End asking for pickup location---//
+                      //---Start asking for dropoff location---//
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: "Dropoff Location",
+                            labelStyle: TextStyle(
+                              color: Color.fromRGBO(125, 179, 59, 1),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          dropdownColor: Color.fromRGBO(44, 62, 80, 1),
+                          style: TextStyle(
+                            color: Color.fromRGBO(255, 206, 206, 1),
+                          ),
+                          value: selectedDropoff,
+                          items: dropOff.map((String location) {
+                            return DropdownMenuItem(
+                              child: Text(location),
+                              value: location,
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedDropoff = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                      //---End asking for dropoff location---//
+                      //---Start asking for notes---//
                       Container(
                         padding: EdgeInsets.all(8),
                         child: TextField(
@@ -223,28 +311,115 @@ class _TripdetailscreenState extends State<Tripdetailscreen> {
                           style: TextStyle(
                             color: Color.fromRGBO(255, 206, 206, 1),
                           ),
-                          maxLines: 6,
+                          maxLines: 2,
                           keyboardType: TextInputType.multiline,
                           controller: notes,
                         ),
                       ),
+                      //---End asking for notes---//
                     ],
                   ),
                 ),
               ),
               SizedBox(height: 20),
+              //---Start display total price---//
               Text(
-                "Total price : ${widget.tripdata.trip_price * (int.tryParse(passnum.text) ?? 0)}",
+                "Total price : ${GetDynamicPrice() * (int.tryParse(passnum.text) ?? 0)}",
               ),
+              //---End display total price---//
             ],
           ),
         ],
       ),
+      //---Start confirming button---//
       bottomNavigationBar: Container(
         padding: EdgeInsets.all(30),
         decoration: BoxDecoration(color: Color.fromRGBO(126, 148, 192, 0)),
-        child: ElevatedButton(onPressed: () {}, child: Text("Confirm")),
+        child: ElevatedButton(
+          onPressed: isLoading
+              ? null
+              : () async {
+                  if (selectedDropoff == null || selectedPickup == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Pickup and Dropoff locations must be selected",
+                        ),
+                        backgroundColor: Colors.redAccent,
+                      ),
+                    );
+                    return;
+                  }
+                  setState(() {
+                    isLoading = true;
+                  });
+                  try {
+                    //---Start asking database for the user credintials---//
+                    String uid = FirebaseAuth.instance.currentUser!.uid;
+                    DocumentSnapshot UserDoc = await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(uid)
+                        .get();
+                    //---End asking database for the user credintials---//
+                    String PassName = UserDoc['name'];
+                    String PassPhoneNumber = UserDoc['phonenumber'];
+                    //---Create reservation---//
+                    await FirebaseFirestore.instance
+                        .collection('reservations')
+                        .add({
+                          'trip_name': widget.tripdata.trip_name,
+                          'pickup_location': selectedPickup,
+                          'dropoff_location': selectedDropoff,
+                          'passengers': int.tryParse(passnum.text) ?? 1,
+                          'bags': int.tryParse(bagnum.text) ?? 0,
+                          'notes': notes.text,
+                          'total_price':
+                              GetDynamicPrice() *
+                              (int.tryParse(passnum.text) ?? 1),
+                          'pass_name': PassName,
+                          'pass_phonenumber': PassPhoneNumber,
+                          'pass_uid': uid,
+                          'status': 'pending',
+                          'time_stamp': FieldValue.serverTimestamp(),
+                        });
+                    //---End creating reservation---//
+
+                    //---Start navigating back to the homescreen---//
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Trip reserved!"),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    Navigator.pop(context);
+                    //---End navigating back to the homescreen---//
+                  } catch (e) {
+                    setState(() {
+                      isLoading = false;
+                    });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("An error occured: $e"),
+                        backgroundColor: Color.fromRGBO(200, 70, 120, 0.5),
+                      ),
+                    );
+                  }
+                },
+          child: isLoading
+              ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text("Confirm"),
+        ),
       ),
+
+      //---End confirming button---//
     );
   }
 }
