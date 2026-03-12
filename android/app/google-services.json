@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "715901211386",
+    "project_id": "myretagapp",
+    "storage_bucket": "myretagapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715901211386:android:2a0c378d2d0589e55eef43",
+        "android_client_info": {
+          "package_name": "com.example.retag_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUy7Rsy9eE4vr2l0TROQ3rKSgJ1nlpZPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
