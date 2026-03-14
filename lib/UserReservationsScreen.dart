@@ -37,11 +37,11 @@ class Userreservationsscreen extends StatelessWidget {
                 ),
               );
             }
-            final MyReservations = snapshot.data!.docs;
+            final myReservations = snapshot.data!.docs;
             return ListView.builder(
-              itemCount: MyReservations.length,
+              itemCount: myReservations.length,
               itemBuilder: (context, index) {
-                var reservations = MyReservations[index];
+                var reservations = myReservations[index];
                 return Card(
                   margin: EdgeInsets.all(10),
                   color: Appcolors.cardBlue,
